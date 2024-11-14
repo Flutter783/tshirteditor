@@ -1,0 +1,405 @@
+name: tshirteditor
+description: "A new Flutter project."
+# The following line prevents the package from being accidentally published to
+# pub.dev using `flutter pub publish`. This is preferred for private packages.
+publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+
+# The following defines the version and build number for your application.
+# A version number is three numbers separated by dots, like 1.2.43
+# followed by an optional build number separated by a +.
+# Both the version and the builder number may be overridden in flutter
+# build by specifying --build-name and --build-number, respectively.
+# In Android, build-name is used as versionName while build-number used as versionCode.
+# Read more about Android versioning at https://developer.android.com/studio/publish/versioning
+# In iOS, build-name is used as CFBundleShortVersionString while build-number is used as CFBundleVersion.
+# Read more about iOS versioning at
+# https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
+# In Windows, build-name is used as the major, minor, and patch parts
+# of the product and file versions while build-number is used as the build suffix.
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.5.3
+
+# Dependencies specify other packages that your package needs in order to work.
+# To automatically upgrade your package dependencies to the latest versions
+# consider running `flutter pub upgrade --major-versions`. Alternatively,
+# dependencies can be manually updated by changing the version numbers below to
+# the latest version available on pub.dev. To see which dependencies have newer
+# versions available, run `flutter pub outdated`.
+dependencies:
+  flutter:
+    sdk: flutter
+
+
+  # The following adds the Cupertino Icons font to your application.
+  # Use with the CupertinoIcons class for iOS style icons.
+  cupertino_icons: ^1.0.8
+  share_plus: ^10.0.3
+  package_info_plus: ^8.0.3
+  provider: ^6.1.2
+  internet_connection_checker: ^1.0.0+1
+  shimmer: ^3.0.0
+  cached_network_image: ^3.4.1
+  flutter_staggered_grid_view: ^0.7.0
+  flutter_svg: ^2.0.10+1
+  device_info_plus: ^10.1.2
+  permission_handler: ^11.3.1
+  path_provider: ^2.1.4
+  intl: ^0.19.0
+  photo_manager: ^3.3.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  # The "flutter_lints" package below contains a set of recommended lints to
+  # encourage good coding practices. The lint set provided by the package is
+  # activated in the `analysis_options.yaml` file located at the root of your
+  # package. See that file for information about deactivating specific lint
+  # rules and activating additional ones.
+  flutter_lints: ^4.0.0
+
+# For information on the generic Dart part of this file, see the
+# following page: https://dart.dev/tools/pub/pubspec
+
+# The following section is specific to Flutter packages.
+flutter:
+
+  # The following line ensures that the Material Icons font is
+  # included with your application, so that you can use the icons in
+  # the material Icons class.
+  uses-material-design: true
+
+  # To add assets to your application, add an assets section, like this:
+  assets:
+    - assets/images/
+  #   - images/a_dot_ham.jpeg
+
+  # An image asset can refer to one or more resolution-specific "variants", see
+  # https://flutter.dev/to/resolution-aware-images
+
+  # For details regarding adding assets from package dependencies, see
+  # https://flutter.dev/to/asset-from-package
+
+  # To add custom fonts to your application, add a fonts section here,
+  # in this "flutter" section. Each entry in this list should have a
+  # "family" key with the font family name, and a "fonts" key with a
+  # list giving the asset and other descriptors for the font. For
+  # example:
+  fonts:
+    - family: font1
+      fonts:
+        - asset: assets/fonts/Abiyells.ttf
+
+    - family: font2
+      fonts:
+        - asset: assets/fonts/Anydore.otf
+
+    - family: font3
+      fonts:
+        - asset: assets/fonts/Arturo-Bold Trial.ttf
+
+    - family: font4
+      fonts:
+        - asset: assets/fonts/Arturo-BoldItalic Trial.ttf
+
+    - family: font5
+      fonts:
+        - asset: assets/fonts/Arturo-ExtraBold Trial.ttf
+
+    - family: font6
+      fonts:
+        - asset: assets/fonts/Arturo-ExtraBoldItalic Trial.ttf
+
+    - family: font7
+      fonts:
+        - asset: assets/fonts/Arturo-ExtraLight Trial.ttf
+
+    - family: font8
+      fonts:
+        - asset: assets/fonts/Arturo-ExtraLightItalic Trial.ttf
+
+    - family: font9
+      fonts:
+        - asset: assets/fonts/Arturo-Heavy Outline Trial.ttf
+
+    - family: font10
+      fonts:
+        - asset: assets/fonts/Arturo-Heavy Trial.ttf
+
+    - family: font11
+      fonts:
+        - asset: assets/fonts/Arturo-HeavyItalic Trial.ttf
+
+    - family: font12
+      fonts:
+        - asset: assets/fonts/Arturo-Italic Trial.ttf
+
+    - family: font13
+      fonts:
+        - asset: assets/fonts/Arturo-Light Trial.ttf
+
+    - family: font14
+      fonts:
+        - asset: assets/fonts/Arturo-LightItalic Trial.ttf
+
+    - family: font15
+      fonts:
+        - asset: assets/fonts/Arturo-Regular Trial.ttf
+
+    - family: font16
+      fonts:
+        - asset: assets/fonts/Arturo-Thin Trial.ttf
+
+    - family: font17
+      fonts:
+        - asset: assets/fonts/Arturo-ThinItalic Trial.ttf
+
+    - family: font18
+      fonts:
+        - asset: assets/fonts/Autogate Regular DEMO.ttf
+
+    - family: font19
+      fonts:
+        - asset: assets/fonts/BARIKA .otf
+
+    - family: font20
+      fonts:
+        - asset: assets/fonts/Baristha.otf
+
+    - family: font21
+      fonts:
+        - asset: assets/fonts/Beautiful Heart.ttf
+
+    - family: font22
+      fonts:
+        - asset: assets/fonts/Billionaire.ttf
+
+    - family: font23
+      fonts:
+        - asset: assets/fonts/Bistecca.ttf
+
+    - family: font24
+      fonts:
+        - asset: assets/fonts/Bllastt Italic.otf
+
+    - family: font25
+      fonts:
+        - asset: assets/fonts/Bllodir Smart.otf
+
+    - family: font26
+      fonts:
+        - asset: assets/fonts/BOOWIE.ttf
+
+    - family: font27
+      fonts:
+        - asset: assets/fonts/booz-uhm-Regular.otf
+
+    - family: font28
+      fonts:
+        - asset: assets/fonts/Brahmana.otf
+
+    - family: font29
+      fonts:
+        - asset: assets/fonts/Brigherdz.ttf
+
+    - family: font30
+      fonts:
+        - asset: assets/fonts/Brisquet.ttf
+
+    - family: font31
+      fonts:
+        - asset: assets/fonts/Brotha Script.ttf
+
+    - family: font32
+      fonts:
+        - asset: assets/fonts/Bughartta.ttf
+
+    - family: font33
+      fonts:
+        - asset: assets/fonts/Bugs_Bony.otf
+
+    - family: font34
+      fonts:
+        - asset: assets/fonts/Bureno Regular.ttf
+
+    - family: font35
+      fonts:
+        - asset: assets/fonts/Bvas Estadas Personal Use Only.ttf
+
+    - family: font36
+      fonts:
+        - asset: assets/fonts/CameoSweetGothic-Regular.ttf
+
+    - family: font37
+      fonts:
+        - asset: assets/fonts/CloudyMega-Regular.ttf
+
+    - family: font38
+      fonts:
+        - asset: assets/fonts/Cocogoose-Compressed-Bold-Italic-trial.ttf
+
+    - family: font39
+      fonts:
+        - asset: assets/fonts/Cocogoose-Compressed-Regular-Trial.ttf
+
+    - family: font40
+      fonts:
+        - asset: assets/fonts/Cocogoose-Condensed-Letterpress-trial.ttf
+
+    - family: font41
+      fonts:
+        - asset: assets/fonts/DobkinScript.ttf
+
+    - family: font42
+      fonts:
+        - asset: assets/fonts/enie_regular.otf
+
+    - family: font43
+      fonts:
+        - asset: assets/fonts/epidemik.ttf
+
+    - family: font44
+      fonts:
+        - asset: assets/fonts/Fashion.ttf
+
+    - family: font45
+      fonts:
+        - asset: assets/fonts/Flame Fetish - TTF.ttf
+
+    - family: font46
+      fonts:
+        - asset: assets/fonts/FLAMINGO.ttf
+
+    - family: font47
+      fonts:
+        - asset: assets/fonts/GamiliaDemoRegular-d9DL7.ttf
+
+    - family: font48
+      fonts:
+        - asset: assets/fonts/GamiliademoRegular-mL9Ev.otf
+
+    - family: font49
+      fonts:
+        - asset: assets/fonts/Jujutsu Kaisen.ttf
+
+    - family: font50
+      fonts:
+        - asset: assets/fonts/Kaibon (DEMO).otf
+
+    - family: font51
+      fonts:
+        - asset: assets/fonts/Lemillion.otf
+
+    - family: font52
+      fonts:
+        - asset: assets/fonts/LucyTheCatRegular-Bg9x.ttf
+
+    - family: font53
+      fonts:
+        - asset: assets/fonts/LucythecatRegular-R7mA.otf
+
+    - family: font54
+      fonts:
+        - asset: assets/fonts/Montello DEMO.otf
+
+    - family: font55
+      fonts:
+        - asset: assets/fonts/Montez-Regular.ttf
+
+    - family: font56
+      fonts:
+        - asset: assets/fonts/Northline.ttf
+
+    - family: font57
+      fonts:
+        - asset: assets/fonts/ocean.ttf
+
+    - family: font58
+      fonts:
+        - asset: assets/fonts/Octobertwilight-lzwZ.otf
+
+    - family: font59
+      fonts:
+        - asset: assets/fonts/OctoberTwilight-Ooe6.ttf
+
+    - family: font60
+      fonts:
+        - asset: assets/fonts/pepinot.otf
+
+    - family: font61
+      fonts:
+        - asset: assets/fonts/Phoresta.ttf
+
+    - family: font62
+      fonts:
+        - asset: assets/fonts/riesling.ttf
+
+    - family: font63
+      fonts:
+        - asset: assets/fonts/Rotterland.ttf
+
+    - family: font64
+      fonts:
+        - asset: assets/fonts/styllo.bold.otf
+
+    - family: font65
+      fonts:
+        - asset: assets/fonts/styllo.regular.otf
+
+    - family: font66
+      fonts:
+        - asset: assets/fonts/The Devil Net.ttf
+
+    - family: font67
+      fonts:
+        - asset: assets/fonts/The Frontman.ttf
+
+    - family: font68
+      fonts:
+        - asset: assets/fonts/The Goldies DEMO.ttf
+
+
+    - family: font69
+      fonts:
+        - asset: assets/fonts/THE HANDBOX.ttf
+
+
+    - family: font70
+      fonts:
+        - asset: assets/fonts/The Heart Maze Demo.ttf
+
+    - family: font71
+      fonts:
+        - asset: assets/fonts/TheHotelio.ttf
+
+    - family: font72
+      fonts:
+        - asset: assets/fonts/Valpuesta.ttf
+
+    - family: font73
+      fonts:
+        - asset: assets/fonts/VanFonting.otf
+
+    - family: font74
+      fonts:
+        - asset: assets/fonts/VANROTT.otf
+
+    - family: font75
+      fonts:
+        - asset: assets/fonts/wacaban.ttf
+
+    - family: font76
+      fonts:
+        - asset: assets/fonts/Yolissa Demo.ttf
+  #       - asset: fonts/Schyler-Italic.ttf
+  #         style: italic
+  #   - family: Trajan Pro
+  #     fonts:
+  #       - asset: fonts/TrajanPro.ttf
+  #       - asset: fonts/TrajanPro_Bold.ttf
+  #         weight: 700
+  #
+  # For details regarding fonts from package dependencies,
+  # see https://flutter.dev/to/font-from-package
