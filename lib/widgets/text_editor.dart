@@ -80,7 +80,7 @@ class _TextEditorState extends State<TextEditor> {
                 ),
               ),
               Positioned(
-                  top: 10,
+                  top: 0,
                   left: 0,
                   child: widget.textModel.isSelected
                       ? GestureDetector(
