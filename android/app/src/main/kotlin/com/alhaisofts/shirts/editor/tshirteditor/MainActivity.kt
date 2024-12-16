@@ -1,4 +1,4 @@
-package com.alhaisofts.design.editor.tshirteditor
+package com.alhaisofts.shirts.editor.tshirteditor
 
 import io.flutter.embedding.android.FlutterActivity
 
