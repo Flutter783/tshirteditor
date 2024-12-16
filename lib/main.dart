@@ -5,7 +5,6 @@ import 'package:tshirteditor/providers/design_provider.dart';
 import 'package:tshirteditor/providers/download_provider.dart';
 import 'package:tshirteditor/providers/shirt_provider.dart';
 import 'package:tshirteditor/providers/logo_provider.dart';
-import 'package:tshirteditor/screens/home_screen.dart';
 import 'package:tshirteditor/screens/splash_screen.dart';
 import 'package:provider/provider.dart';
 

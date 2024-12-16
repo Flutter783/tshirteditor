@@ -4,6 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:share_plus/share_plus.dart';
 
+import '../services/ad_Server.dart';
+import '../services/bannerAd.dart';
+
 class MyWorkScreen extends StatefulWidget {
   final String shirtPath;
   final VoidCallback onDeleted;
@@ -100,7 +103,13 @@ class _MyWorkScreenState extends State<MyWorkScreen> {
                 ),
               ),
             ),
-            Container(height: 70)
+            SizedBox(
+              height: 60,
+              child: AdsServer().isInternetConnected
+                  ? BannerAdWidget(
+                  width: MediaQuery.of(context).size.width, maxHeight: 60)
+                  : Container(),
+            )
           ],
         ),
       ),

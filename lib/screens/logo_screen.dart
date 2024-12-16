@@ -5,9 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:tshirteditor/providers/logo_provider.dart';
 import 'package:tshirteditor/service/app_color.dart';
-import '../internet_checker.dart';
 import '../services/ad_Server.dart';
-import '../widgets/shimmer_widget.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 
 
@@ -44,8 +42,9 @@ class _LogoScreenState extends State<LogoScreen> {
                 children: [
                   IconButton(
                       onPressed: () {
-                        adsServer.showInterstitialIfAvailable(true);
-                        Navigator.pop(context);
+                        adsServer.showInterstitialIfAvailable(true, onActionDone: (){
+                          Navigator.pop(context);
+                        });
                       },
                       icon: const Icon(Icons.arrow_back_ios,
                           color: Colors.black, size: 30)),
@@ -89,7 +88,7 @@ class _LogoScreenState extends State<LogoScreen> {
                               Align(
                                   alignment: Alignment.center,
                                   child: Text(
-                                      isInternetConnected
+                                      AdsServer().isInternetConnected
                                           ? 'Server not response'
                                           : 'No internet connection',
                                       style: const TextStyle(
@@ -128,11 +127,12 @@ class _LogoScreenState extends State<LogoScreen> {
               itemBuilder: (context, index) {
                 return GestureDetector(
                   onTap: () {
-                    adsServer.showInterstitialIfAvailable(true);
-                    Navigator.pop(
-                        context,
-                        provider
-                            .logoModel[index].logoImage);
+                    adsServer.showInterstitialIfAvailable(true, onActionDone: (){
+                      Navigator.pop(
+                          context,
+                          provider
+                              .logoModel[index].logoImage);
+                    });
                   },
                   child: Card(
                     margin: const EdgeInsets.all(0),
@@ -156,7 +156,7 @@ class _LogoScreenState extends State<LogoScreen> {
                             color: Colors.white,
                           ),
                         ),
-                        errorWidget: (context, url, error) => Icon(Icons.error),
+                        errorWidget: (context, url, error) => const Icon(Icons.error),
                       ),
                     ),
                   ),
@@ -168,7 +168,7 @@ class _LogoScreenState extends State<LogoScreen> {
         } else {
           return GestureDetector(
           onTap: () async {
-            if (isInternetConnected) {
+            if (AdsServer().isInternetConnected) {
               await provider.fetchLogo();
             }
           },

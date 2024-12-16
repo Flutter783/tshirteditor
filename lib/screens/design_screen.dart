@@ -5,9 +5,8 @@ import 'package:provider/provider.dart';
 import 'package:tshirteditor/providers/design_provider.dart';
 import 'package:tshirteditor/screens/design_detail_screen.dart';
 import 'package:tshirteditor/services/ad_Server.dart';
-
-import '../internet_checker.dart';
 import '../service/app_color.dart';
+import '../services/bannerAd.dart';
 import '../widgets/shimmer_widget.dart';
 
 class DesignScreen extends StatefulWidget {
@@ -96,7 +95,7 @@ class _DesignScreenState extends State<DesignScreen> {
                                 Align(
                                     alignment: Alignment.center,
                                     child: Text(
-                                        isInternetConnected
+                                        AdsServer().isInternetConnected
                                             ? 'Server not response'
                                             : 'No internet connection',
                                         style: const TextStyle(
@@ -112,6 +111,10 @@ class _DesignScreenState extends State<DesignScreen> {
                 ),
               ),
             ),
+            AdsServer().isInternetConnected
+                ? BannerAdWidget(
+                width: MediaQuery.of(context).size.width, maxHeight: 60)
+                : Container(),
           ],
         ),
       ),
@@ -140,17 +143,18 @@ class _DesignScreenState extends State<DesignScreen> {
                     itemBuilder: (context, index) {
                       return GestureDetector(
                         onTap: () {
-                          adsServer.showInterstitialIfAvailable(true);
-                          String designId =
-                              designProvider.designModel[index].designId;
-                          String designLink =
-                              designProvider.designModel[index].designImage;
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => DesignDetailScreen(
-                                      designLink: designLink,
-                                      designId: designId)));
+                          adsServer.showInterstitialIfAvailable(true, onActionDone: (){
+                            String designId =
+                                designProvider.designModel[index].designId;
+                            String designLink =
+                                designProvider.designModel[index].designImage;
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => DesignDetailScreen(
+                                        designLink: designLink,
+                                        designId: designId)));
+                          });
                         },
                         child: Stack(
                           fit: StackFit.expand,
@@ -203,7 +207,7 @@ class _DesignScreenState extends State<DesignScreen> {
                 padding: const EdgeInsets.all(20),
                 child: GestureDetector(
                   onTap: () async {
-                    if (isInternetConnected) {
+                    if (AdsServer().isInternetConnected) {
                       await designProvider.fetchDesignList();
                     }
                   },

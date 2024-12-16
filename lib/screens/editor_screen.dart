@@ -311,8 +311,9 @@ class _EditorScreenState extends State<EditorScreen>
               setState(() {
                 clearBorder();
               });
-              adsServer.showInterstitialIfAvailable(true);
-              addNewText();
+              adsServer.showInterstitialIfAvailable(true, onActionDone: (){
+                addNewText();
+              });
             },
             child: Padding(
               padding: const EdgeInsets.all(5),
@@ -366,17 +367,18 @@ class _EditorScreenState extends State<EditorScreen>
           ),
           GestureDetector(
             onTap: () {
-              adsServer.showInterstitialIfAvailable(true);
-              showProgress();
-              clearBorder();
-              WidgetsBinding.instance.addPostFrameCallback((_) async {
-                Uint8List shirtBytes = await captureShirtDesign();
-                Navigator.pop(context);
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) =>
-                            FinalScreen(shirtBytes: shirtBytes)));
+              adsServer.showInterstitialIfAvailable(false, onActionDone: (){
+                showProgress();
+                clearBorder();
+                WidgetsBinding.instance.addPostFrameCallback((_) async {
+                  Uint8List shirtBytes = await captureShirtDesign();
+                  Navigator.pop(context);
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) =>
+                              FinalScreen(shirtBytes: shirtBytes)));
+                });
               });
             },
             child: Padding(
@@ -427,15 +429,16 @@ class _EditorScreenState extends State<EditorScreen>
             actions: <Widget>[
               TextButton(
                 onPressed: () {
-                  adsServer.showInterstitialIfAvailable(true);
-                  Navigator.of(context).pop(true);
+                  adsServer.showInterstitialIfAvailable(false, onActionDone: (){
+                    Navigator.of(context).pop(true);
+                  });
+
                 },
                 child: const Text('Discard',
                     style: TextStyle(color: Colors.black)),
               ),
               TextButton(
                 onPressed: () {
-                  adsServer.showInterstitialIfAvailable(true);
                   Navigator.of(context).pop(false);
                 },
                 child: const Text('Continue',

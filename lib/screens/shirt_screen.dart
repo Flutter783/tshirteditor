@@ -4,8 +4,8 @@ import 'package:provider/provider.dart';
 import 'package:tshirteditor/providers/shirt_provider.dart';
 import 'package:tshirteditor/screens/editor_screen.dart';
 import 'package:tshirteditor/service/app_color.dart';
-import '../internet_checker.dart';
 import '../services/ad_Server.dart';
+import '../services/bannerAd.dart';
 import '../widgets/shimmer_widget.dart';
 
 class ShirtScreen extends StatefulWidget {
@@ -86,7 +86,7 @@ class _ShirtScreenState extends State<ShirtScreen> {
                               Align(
                                   alignment: Alignment.center,
                                   child: Text(
-                                      isInternetConnected
+                                      AdsServer().isInternetConnected
                                           ? 'Server not response'
                                           : 'No internet connection',
                                       style: const TextStyle(
@@ -101,6 +101,10 @@ class _ShirtScreenState extends State<ShirtScreen> {
                 },
               ),
             ),
+            AdsServer().isInternetConnected
+                ? BannerAdWidget(
+                width: MediaQuery.of(context).size.width, maxHeight: 100)
+                : Container(),
           ],
         ),
       ),
@@ -152,13 +156,14 @@ class _ShirtScreenState extends State<ShirtScreen> {
                       alignment: Alignment.topRight,
                       child: GestureDetector(
                         onTap: (){
-                          adsServer.showInterstitialIfAvailable(true);
-                          String shirtLink=designProvider.shirtModel[index].shirtImage;
-                          if(widget.isEditorScreen){
-                            Navigator.pop(context, shirtLink);
-                          }else{
-                            Navigator.push(context, MaterialPageRoute(builder: (context) => EditorScreen(shirtLink: shirtLink)));
-                          }
+                          adsServer.showInterstitialIfAvailable(true, onActionDone: (){
+                            String shirtLink=designProvider.shirtModel[index].shirtImage;
+                            if(widget.isEditorScreen){
+                              Navigator.pop(context, shirtLink);
+                            }else{
+                              Navigator.push(context, MaterialPageRoute(builder: (context) => EditorScreen(shirtLink: shirtLink)));
+                            }
+                          });
                         },
                         child: Container(
                           margin: const EdgeInsets.all(20),
@@ -179,7 +184,7 @@ class _ShirtScreenState extends State<ShirtScreen> {
         )
             : GestureDetector(
           onTap: () async {
-            if (isInternetConnected) {
+            if (AdsServer().isInternetConnected) {
               await designProvider.fetchShirts();
             }
           },

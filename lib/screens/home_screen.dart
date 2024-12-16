@@ -3,18 +3,15 @@ import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:share_plus/share_plus.dart';
-import 'package:tshirteditor/constants/assets.dart';
 import 'package:tshirteditor/screens/design_screen.dart';
 import 'package:tshirteditor/screens/saved_screen.dart';
 import 'package:tshirteditor/screens/shirt_screen.dart';
 import 'package:tshirteditor/service/app_color.dart';
 import 'package:tshirteditor/services/ad_Server.dart';
 
-import '../internet_checker.dart';
 import '../services/admanager.dart';
 import '../services/bannerAd.dart';
 
@@ -26,58 +23,16 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver{
-  late BannerAd mainBanner;
-  bool isMainBannerLoaded = false;
 
-  late AppOpenAdManager appOpenAdManager;
-  bool isPaused = false;
 
   final AdsServer adsServer = AdsServer();
 
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      loadBannerAd();
-    });
-
-    WidgetsBinding.instance.addObserver(this);
-
-    appOpenAdManager = AppOpenAdManager();
-    appOpenAdManager.loadAd();
-    appOpenAdManager.showAdIfAvailable();
-    loadBannerAd();
-  }
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    super.didChangeAppLifecycleState(state);
-    if (state == AppLifecycleState.paused) {
-      isPaused = true;
-    }
-    if (state == AppLifecycleState.resumed && isPaused) {
-      appOpenAdManager.showAdIfAvailable();
-      isPaused = false;
-    }
+    AppOpenAdManager().loadAd();
   }
 
-  void loadBannerAd() {
-    mainBanner = BannerAd(
-      size: AdSize.banner,
-      adUnitId: AdsAssets.bannerAd,
-      listener: BannerAdListener(
-        onAdFailedToLoad: (ad, error) {
-          ad.dispose();
-        },
-        onAdLoaded: (ad) {
-          setState(() {
-            isMainBannerLoaded = true;
-          });
-        },
-      ),
-      request: const AdRequest(),
-    );
-    mainBanner.load();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -174,12 +129,13 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver{
                             Expanded(
                               child: GestureDetector(
                                 onTap: () {
-                                  adsServer.showInterstitialIfAvailable(true);
-                                  Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) =>
-                                              const ShirtScreen(isEditorScreen: false)));
+                                  adsServer.showInterstitialIfAvailable(true,onActionDone: (){
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                            const ShirtScreen(isEditorScreen: false)));
+                                  });
                                 },
                                 child: Container(
                                   width: double.infinity,
@@ -230,12 +186,14 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver{
                             Expanded(
                               child: GestureDetector(
                                 onTap: () {
-                                  adsServer.showInterstitialIfAvailable(true);
-                                  Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) =>
-                                              const DesignScreen()));
+                                  adsServer.showInterstitialIfAvailable(true,onActionDone: (){
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                            const DesignScreen()));
+                                  });
+
                                 },
                                 child: Container(
                                   width: double.infinity,
@@ -344,14 +302,14 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver{
                           ],
                         ),
                         const SizedBox(height: 20,),
-                        isInternetConnected
-                            ? BannerAdWidget(
-                            width: MediaQuery.of(context).size.width, maxHeight: 100)
-                            : Container(),
                       ],
                     ),
                   ),
                 )),
+                AdsServer().isInternetConnected
+                    ? BannerAdWidget(
+                    width: MediaQuery.of(context).size.width, maxHeight: 100)
+                    : Container(),
               ],
             )),
       ),
@@ -435,7 +393,10 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver{
     }
 
     if (status) {
-      Navigator.push(context, MaterialPageRoute(builder: (context) => const SavedScreen()));
+      adsServer.showInterstitialIfAvailable(true,onActionDone: (){
+        Navigator.push(context, MaterialPageRoute(builder: (context) => const SavedScreen()));
+      });
+
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Storage permission denied')),

@@ -10,6 +10,8 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:photo_manager/photo_manager.dart';
 import 'package:share_plus/share_plus.dart';
 import '../service/app_color.dart';
+import '../services/ad_Server.dart';
+import '../services/bannerAd.dart';
 import '../sqf/sqf_database.dart';
 import 'package:http/http.dart' as http;
 
@@ -132,7 +134,13 @@ class _FavouriteDetailScreenState extends State<FavouriteDetailScreen> {
                 ),
               ),
             ),
-            Container(height: 50)
+            SizedBox(
+              height: 60,
+              child: AdsServer().isInternetConnected
+                  ? BannerAdWidget(
+                  width: MediaQuery.of(context).size.width, maxHeight: 60)
+                  : Container(),
+            )
           ],
         ),
       ),

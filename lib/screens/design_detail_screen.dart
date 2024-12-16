@@ -10,6 +10,7 @@ import 'package:photo_manager/photo_manager.dart';
 import 'package:tshirteditor/service/app_color.dart';
 import 'package:http/http.dart' as http;
 import 'package:tshirteditor/services/ad_Server.dart';
+import '../services/bannerAd.dart';
 import '../sqf/sqf_database.dart';
 
 class DesignDetailScreen extends StatefulWidget {
@@ -90,7 +91,6 @@ class _DesignDetailScreenState extends State<DesignDetailScreen> {
                       alignment: Alignment.topRight,
                       child: GestureDetector(
                         onTap: () {
-                          adsServer.showInterstitialIfAvailable(true);
                           if (isFavourite) {
                             removeFromFavourite(widget.designId);
                             setState(() {
@@ -102,6 +102,7 @@ class _DesignDetailScreenState extends State<DesignDetailScreen> {
                               isFavourite=true;
                             });
                           }
+
                         },
                         child: Container(
                           height: 45,
@@ -141,13 +142,14 @@ class _DesignDetailScreenState extends State<DesignDetailScreen> {
                       alignment: Alignment.bottomRight,
                       child: GestureDetector(
                         onTap: () {
-                          adsServer.showInterstitialIfAvailable(true);
                           if(isAlreadyDownloaded){
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(content: Text('Downloaded')),
                             );
                           }else{
-                            downloadDesign();
+                            adsServer.showInterstitialIfAvailable(true, onActionDone: (){
+                              downloadDesign();
+                            });
                           }
 
                         },
@@ -179,7 +181,14 @@ class _DesignDetailScreenState extends State<DesignDetailScreen> {
                 ),
               ),
             ),
-            Container(height: 50)
+            const SizedBox(height: 8),
+            SizedBox(
+              height: 60,
+              child: AdsServer().isInternetConnected
+                  ? BannerAdWidget(
+                  width: MediaQuery.of(context).size.width, maxHeight: 60)
+                  : Container(),
+            ),
           ],
         ),
       ),

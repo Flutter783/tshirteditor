@@ -3,9 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:tshirteditor/screens/my_work_screen.dart';
 import 'package:tshirteditor/service/app_color.dart';
-import 'package:tshirteditor/services/ad_Server.dart';
 import 'package:tshirteditor/sqf/favourite_shirt.dart';
 import '../providers/download_provider.dart';
+import '../services/ad_Server.dart';
+import '../services/bannerAd.dart';
 import '../sqf/sqf_database.dart';
 import 'favourite_detail_screen.dart';
 
@@ -29,7 +30,6 @@ class _SavedScreenState extends State<SavedScreen> {
       provider.loadDownloadedFiles();
     });
   }
-  final AdsServer adsServer = AdsServer();
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -62,7 +62,6 @@ class _SavedScreenState extends State<SavedScreen> {
                   Expanded(
                     child: GestureDetector(
                       onTap: (){
-                        adsServer.showInterstitialIfAvailable(true);
                         setState(() {
                           currentIndex=0;
                         });
@@ -99,7 +98,6 @@ class _SavedScreenState extends State<SavedScreen> {
                   Expanded(
                     child: GestureDetector(
                       onTap: (){
-                        adsServer.showInterstitialIfAvailable(true);
                         setState(() {
                           currentIndex=1;
                           isFetching=true;
@@ -240,7 +238,11 @@ class _SavedScreenState extends State<SavedScreen> {
                       );
                     },
                   ),
-            ))
+            )),
+            AdsServer().isInternetConnected
+                ? BannerAdWidget(
+                width: MediaQuery.of(context).size.width, maxHeight: 100)
+                : Container(),
           ],
         ),
       ),

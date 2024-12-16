@@ -7,8 +7,9 @@ import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:photo_manager/photo_manager.dart';
 import 'package:share_plus/share_plus.dart';
-import 'package:tshirteditor/services/ad_Server.dart';
 import 'dart:typed_data';
+import '../services/ad_Server.dart';
+import '../services/bannerAd.dart';
 import 'home_screen.dart';
 
 class FinalScreen extends StatefulWidget {
@@ -20,7 +21,6 @@ class FinalScreen extends StatefulWidget {
 }
 
 class _FinalScreenState extends State<FinalScreen> {
-  final AdsServer adsServer = AdsServer();
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -34,7 +34,6 @@ class _FinalScreenState extends State<FinalScreen> {
                 children: [
                   IconButton(
                       onPressed: () {
-                        adsServer.showInterstitialIfAvailable(true);
                         Navigator.pop(context);
                       },
                       icon: const Icon(Icons.arrow_back_ios,
@@ -47,6 +46,10 @@ class _FinalScreenState extends State<FinalScreen> {
                 ],
               ),
             ),
+            AdsServer().isInternetConnected
+                ? BannerAdWidget(
+                width: MediaQuery.of(context).size.width, maxHeight: 100)
+                : Container(),
             Expanded(
                 child: Padding(
                   padding: const EdgeInsets.all(15),
@@ -57,7 +60,6 @@ class _FinalScreenState extends State<FinalScreen> {
               children: [
                 GestureDetector(
                   onTap: () {
-                    adsServer.showInterstitialIfAvailable(true);
                     shareDesign();
                   },
                   child: Container(
@@ -83,7 +85,6 @@ class _FinalScreenState extends State<FinalScreen> {
                 ),
                 GestureDetector(
                   onTap: () {
-                    adsServer.showInterstitialIfAvailable(true);
                     permissionChecker();
                   },
                   child: Container(

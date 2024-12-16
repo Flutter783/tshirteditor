@@ -13,7 +13,7 @@ class AdsServer {
   AdsServer._internal();
   InterstitialAd? interstitialAd;
   int clickCounter = 0;
-  int maxClicksBeforeAd = 3;
+  int maxClicksBeforeAd = 2;
   bool isInternetConnected=false;
   bool requestToLoadInterstitial=false;
 
@@ -42,7 +42,7 @@ class AdsServer {
       ),
     );
   }
-  void showInterstitialIfAvailable(bool clickCount, {Function? onActionDone}) {
+  void showInterstitialIfAvailable(bool clickCount, {required Function onActionDone}) {
     if(!clickCount){
       clickCounter=0;
     }
@@ -55,7 +55,7 @@ class AdsServer {
             clickCounter++;
             interstitialAd = null;
             requestToLoadInterstitial=false;
-            onActionDone?.call();
+            onActionDone.call();
           },
           onAdFailedToShowFullScreenContent:
               (InterstitialAd ad, AdError error) {
@@ -67,13 +67,13 @@ class AdsServer {
         );
       } else if (clickCounter >= maxClicksBeforeAd) {
         clickCounter = 0;
-        onActionDone?.call();
+        onActionDone.call();
       } else {
         clickCounter++;
-        onActionDone?.call();
+        onActionDone.call();
       }
     } else {
-      onActionDone?.call();
+      onActionDone.call();
     }
   }
 
