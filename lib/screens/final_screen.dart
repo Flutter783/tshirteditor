@@ -7,6 +7,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:photo_manager/photo_manager.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:tshirteditor/services/ad_Server.dart';
 import 'dart:typed_data';
 import 'home_screen.dart';
 
@@ -19,6 +20,7 @@ class FinalScreen extends StatefulWidget {
 }
 
 class _FinalScreenState extends State<FinalScreen> {
+  final AdsServer adsServer = AdsServer();
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -32,6 +34,7 @@ class _FinalScreenState extends State<FinalScreen> {
                 children: [
                   IconButton(
                       onPressed: () {
+                        adsServer.showInterstitialIfAvailable(true);
                         Navigator.pop(context);
                       },
                       icon: const Icon(Icons.arrow_back_ios,
@@ -54,6 +57,7 @@ class _FinalScreenState extends State<FinalScreen> {
               children: [
                 GestureDetector(
                   onTap: () {
+                    adsServer.showInterstitialIfAvailable(true);
                     shareDesign();
                   },
                   child: Container(
@@ -79,6 +83,7 @@ class _FinalScreenState extends State<FinalScreen> {
                 ),
                 GestureDetector(
                   onTap: () {
+                    adsServer.showInterstitialIfAvailable(true);
                     permissionChecker();
                   },
                   child: Container(
@@ -109,52 +114,89 @@ class _FinalScreenState extends State<FinalScreen> {
       ),
     );
   }
-  Future<void> permissionChecker() async{
-    bool status;
-    if (Platform.isAndroid) {
-      final deviceInfo = await DeviceInfoPlugin().androidInfo;
-      if (deviceInfo.version.sdkInt <= 32) {
-        status = await Permission.storage.request().isGranted;
+  Future<void> permissionChecker() async {
+    bool status = false;
+
+    try {
+      if (Platform.isAndroid) {
+        final deviceInfo = await DeviceInfoPlugin().androidInfo;
+        if (deviceInfo.version.sdkInt <= 32) {
+          status = await Permission.storage.request().isGranted;
+        } else {
+          status = await Permission.photos.request().isGranted;
+        }
+      } else if (Platform.isIOS) {
+        PermissionStatus permissionStatus = await Permission.photos.status;
+        print("Initial Photos permission status: $permissionStatus");
+
+        if (permissionStatus.isDenied) {
+          print("Requesting Photos permission...");
+          status = await Permission.photos.request().isGranted;
+          print("Photos permission granted: $status");
+        } else if (permissionStatus.isPermanentlyDenied) {
+          // If permanently denied, show dialog and open settings
+          print("Photos permission is permanently denied.");
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Please enable photo permissions in settings to download images.'),
+            ),
+          );
+          await openAppSettings();
+          return;
+        } else {
+          status = permissionStatus.isGranted;
+        }
       } else {
-        status = await Permission.photos.request().isGranted;
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Unsupported platform!')),
+        );
+        return;
       }
-    } else if (Platform.isIOS) {
-      status = await Permission.photosAddOnly.request().isGranted;
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Unsupported platform!'))
-      );
-      return;
-    }
 
-    if (status) {
-      final directory = Platform.isIOS ? await getApplicationDocumentsDirectory() : await getExternalStorageDirectory(); // Use a different directory based on the OS
+      if (status) {
+        // Set storage directory based on platform
+        final directory = Platform.isIOS
+            ? await getApplicationDocumentsDirectory()
+            : await getExternalStorageDirectory();
 
-      final formattedDate = DateFormat('yyyy-MM-dd_HH-mm-ss').format(DateTime.now());
-      final folderPath = '${directory?.path}/T-Shirt Editor';
-      final newFolder = Directory(folderPath);
-      if (!await newFolder.exists()) {
-        await newFolder.create(recursive: true);
-      }
-      final path = '$folderPath/image_$formattedDate.png';
-      final file = File(path);
-      await file.writeAsBytes(widget.shirtBytes);
-      final assetEntity = await PhotoManager.editor.saveImageWithPath(file.path, title: 'T-Shirt Design');
-      if (assetEntity != null) {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Saved!')));
-        Navigator.pop(context);
-        Navigator.push(context, MaterialPageRoute(builder: (context) => const HomeScreen()));
+        if (directory == null) {
+          throw Exception("Could not find a valid storage directory.");
+        }
 
+        final formattedDate = DateFormat('yyyy-MM-dd_HH-mm-ss').format(DateTime.now());
+        final folderPath = '${directory.path}/T-Shirt Editor';
+        final newFolder = Directory(folderPath);
+        if (!await newFolder.exists()) {
+          await newFolder.create(recursive: true);
+        }
+
+        final path = '$folderPath/image_$formattedDate.png';
+        final file = File(path);
+        await file.writeAsBytes(widget.shirtBytes);
+
+        // Save image to gallery using PhotoManager
+        final assetEntity = await PhotoManager.editor.saveImageWithPath(file.path, title: 'T-Shirt Design');
+        if (assetEntity != null) {
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Saved!')));
+          Navigator.pop(context);
+          Navigator.push(context, MaterialPageRoute(builder: (context) => const HomeScreen()));
+        } else {
+          Navigator.pop(context);
+          throw Exception('Failed to save image to gallery');
+        }
       } else {
-        Navigator.pop(context);
-        throw Exception('Failed to save image to gallery');
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Storage permission denied')),
+        );
       }
-    } else {
+    } catch (e) {
+      print("Permission or saving error: $e");
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Storage permission denied')),
+        SnackBar(content: Text('Error: $e')),
       );
     }
   }
+
   Future<void> shareDesign() async {
     final directory = await getTemporaryDirectory();
     final path = '${directory.path}/shirt_designed_image.png';

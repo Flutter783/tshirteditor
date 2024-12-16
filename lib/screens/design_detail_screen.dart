@@ -9,6 +9,7 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:photo_manager/photo_manager.dart';
 import 'package:tshirteditor/service/app_color.dart';
 import 'package:http/http.dart' as http;
+import 'package:tshirteditor/services/ad_Server.dart';
 import '../sqf/sqf_database.dart';
 
 class DesignDetailScreen extends StatefulWidget {
@@ -50,6 +51,7 @@ class _DesignDetailScreenState extends State<DesignDetailScreen> {
           {DatabaseHelper.shirtId: id, DatabaseHelper.shirtImage: image});
     }
   }
+  final AdsServer adsServer = AdsServer();
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -88,6 +90,7 @@ class _DesignDetailScreenState extends State<DesignDetailScreen> {
                       alignment: Alignment.topRight,
                       child: GestureDetector(
                         onTap: () {
+                          adsServer.showInterstitialIfAvailable(true);
                           if (isFavourite) {
                             removeFromFavourite(widget.designId);
                             setState(() {
@@ -138,6 +141,7 @@ class _DesignDetailScreenState extends State<DesignDetailScreen> {
                       alignment: Alignment.bottomRight,
                       child: GestureDetector(
                         onTap: () {
+                          adsServer.showInterstitialIfAvailable(true);
                           if(isAlreadyDownloaded){
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(content: Text('Downloaded')),
@@ -183,34 +187,73 @@ class _DesignDetailScreenState extends State<DesignDetailScreen> {
   }
   Future<void> downloadDesign() async {
     bool status = false;
-    if (Platform.isAndroid) {
-      final deviceInfo = await DeviceInfoPlugin().androidInfo;
-      if (deviceInfo.version.sdkInt <= 32) {
-        status = await Permission.storage.request().isGranted;
-      } else {
-        status = await Permission.photos.request().isGranted;
-      }
-    } else if (Platform.isIOS) {
-      status = await Permission.photosAddOnly.request().isGranted;
-    }
 
-    if (!status) {
+    try {
+      // Request permissions based on platform and Android version
+      if (Platform.isAndroid) {
+        final deviceInfo = await DeviceInfoPlugin().androidInfo;
+        if (deviceInfo.version.sdkInt <= 32) {
+          status = await Permission.storage.request().isGranted;
+        } else {
+          status = await Permission.photos.request().isGranted;
+        }
+      } else if (Platform.isIOS) {
+        PermissionStatus permissionStatus = await Permission.photos.status;
+        print("Initial Photos permission status: $permissionStatus");
+
+        if (permissionStatus.isDenied) {
+          print("Requesting Photos permission...");
+          status = await Permission.photos.request().isGranted;
+          print("Photos permission granted: $status");
+        } else if (permissionStatus.isPermanentlyDenied) {
+          // If permanently denied, show dialog and open settings
+          print("Photos permission is permanently denied.");
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Please enable photo permissions in settings to download images.'),
+            ),
+          );
+          await openAppSettings();
+          return;
+        } else {
+          status = permissionStatus.isGranted;
+        }
+      }
+
+      if (!status) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Storage permission denied')),
+        );
+        return;
+      }
+    } catch (e) {
+      print("Error requesting permissions: $e");
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Storage permission denied')),
+        SnackBar(content: Text('Error requesting permissions: $e')),
       );
       return;
     }
+
+    // Show loading dialog
     showCustomLoadingDialog('Downloading...');
+
     try {
+      // Download the image
       final response = await http.get(Uri.parse(widget.designLink));
       if (response.statusCode == 200) {
         final byteData = response.bodyBytes;
+
+        // Set storage directory based on platform
         final directory = Platform.isIOS
             ? await getApplicationDocumentsDirectory()
             : await getExternalStorageDirectory();
-        final formattedDate =
-        DateFormat('yyyy-MM-dd_HH-mm-ss').format(DateTime.now());
-        final folderPath = '${directory?.path}/T-Shirt Designs';
+
+        if (directory == null) {
+          throw Exception("Could not find a valid storage directory.");
+        }
+
+        final formattedDate = DateFormat('yyyy-MM-dd_HH-mm-ss').format(DateTime.now());
+        final folderPath = '${directory.path}/T-Shirt Designs';
         final newFolder = Directory(folderPath);
         if (!await newFolder.exists()) {
           await newFolder.create(recursive: true);
@@ -218,12 +261,21 @@ class _DesignDetailScreenState extends State<DesignDetailScreen> {
         final path = '$folderPath/image_$formattedDate.png';
         final file = File(path);
         await file.writeAsBytes(byteData);
+
+        // Save image to gallery using PhotoManager
         final assetEntity = await PhotoManager.editor
             .saveImageWithPath(file.path, title: 'T-Shirt Design');
+
+        if (!mounted) return; // Check if widget is still in the tree
+        Navigator.pop(context); // Close loading dialog
+
         if (assetEntity != null) {
-          Navigator.pop(context);
-          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Download successful!')));
-          isAlreadyDownloaded=true;
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Download successful!')),
+          );
+          setState(() {
+            isAlreadyDownloaded = true;
+          });
         } else {
           throw Exception('Failed to save image to gallery');
         }
@@ -231,13 +283,16 @@ class _DesignDetailScreenState extends State<DesignDetailScreen> {
         throw Exception('Failed to download image: ${response.statusCode}');
       }
     } catch (e) {
-      Navigator.pop(context);
+      if (mounted) Navigator.pop(context); // Ensure dialog is closed if an error occurs
+      print("Download error: $e");
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-            content: Text('An error occurred while downloading the image: $e')),
+        SnackBar(content: Text('An error occurred while downloading the image: $e')),
       );
     }
   }
+
+
+
   void showCustomLoadingDialog(String message) {
     showDialog(
       context: context,

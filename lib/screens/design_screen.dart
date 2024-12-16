@@ -4,6 +4,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 import 'package:tshirteditor/providers/design_provider.dart';
 import 'package:tshirteditor/screens/design_detail_screen.dart';
+import 'package:tshirteditor/services/ad_Server.dart';
 
 import '../internet_checker.dart';
 import '../service/app_color.dart';
@@ -28,6 +29,7 @@ class _DesignScreenState extends State<DesignScreen> {
       }
     });
   }
+  final AdsServer adsServer = AdsServer();
 
   @override
   Widget build(BuildContext context) {
@@ -138,6 +140,7 @@ class _DesignScreenState extends State<DesignScreen> {
                     itemBuilder: (context, index) {
                       return GestureDetector(
                         onTap: () {
+                          adsServer.showInterstitialIfAvailable(true);
                           String designId =
                               designProvider.designModel[index].designId;
                           String designLink =

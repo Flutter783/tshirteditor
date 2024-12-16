@@ -5,6 +5,7 @@ import 'package:tshirteditor/providers/shirt_provider.dart';
 import 'package:tshirteditor/screens/editor_screen.dart';
 import 'package:tshirteditor/service/app_color.dart';
 import '../internet_checker.dart';
+import '../services/ad_Server.dart';
 import '../widgets/shimmer_widget.dart';
 
 class ShirtScreen extends StatefulWidget {
@@ -27,7 +28,7 @@ class _ShirtScreenState extends State<ShirtScreen> {
       }
     });
   }
-
+  final AdsServer adsServer = AdsServer();
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -45,7 +46,7 @@ class _ShirtScreenState extends State<ShirtScreen> {
                       },
                       icon: const Icon(Icons.arrow_back_ios,
                           color: Colors.black, size: 30)),
-                  const Text('Shirt Ideas',
+                  const Text('Select Shirt',
                       style: TextStyle(
                           color: Colors.black,
                           fontSize: 20,
@@ -151,6 +152,7 @@ class _ShirtScreenState extends State<ShirtScreen> {
                       alignment: Alignment.topRight,
                       child: GestureDetector(
                         onTap: (){
+                          adsServer.showInterstitialIfAvailable(true);
                           String shirtLink=designProvider.shirtModel[index].shirtImage;
                           if(widget.isEditorScreen){
                             Navigator.pop(context, shirtLink);

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../internet_checker.dart';
+import '../services/ad_Server.dart';
 import 'home_screen.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -10,11 +11,14 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
+  final AdsServer adsServer = AdsServer();
   @override
+
   void initState() {
     super.initState();
     InternetChecker().checkInternet();
     navigateScreen();
+    adsServer.checkInternet();
 
   }
   void navigateScreen() {

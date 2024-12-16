@@ -8,6 +8,7 @@ import 'package:tshirteditor/screens/logo_screen.dart';
 import 'package:tshirteditor/screens/shirt_screen.dart';
 import 'package:tshirteditor/service/app_color.dart';
 import 'dart:typed_data';
+import '../services/ad_Server.dart';
 import '../widgets/sticker_editor.dart';
 import '../widgets/sticker_model.dart';
 import '../widgets/text_editor.dart';
@@ -310,6 +311,7 @@ class _EditorScreenState extends State<EditorScreen>
               setState(() {
                 clearBorder();
               });
+              adsServer.showInterstitialIfAvailable(true);
               addNewText();
             },
             child: Padding(
@@ -364,6 +366,7 @@ class _EditorScreenState extends State<EditorScreen>
           ),
           GestureDetector(
             onTap: () {
+              adsServer.showInterstitialIfAvailable(true);
               showProgress();
               clearBorder();
               WidgetsBinding.instance.addPostFrameCallback((_) async {
@@ -413,7 +416,7 @@ class _EditorScreenState extends State<EditorScreen>
       });
     }
   }
-
+  final AdsServer adsServer = AdsServer();
   Future<bool> onBackPressedDiscard() async {
     bool shouldDiscard = await showDialog(
           context: context,
@@ -424,6 +427,7 @@ class _EditorScreenState extends State<EditorScreen>
             actions: <Widget>[
               TextButton(
                 onPressed: () {
+                  adsServer.showInterstitialIfAvailable(true);
                   Navigator.of(context).pop(true);
                 },
                 child: const Text('Discard',
@@ -431,6 +435,7 @@ class _EditorScreenState extends State<EditorScreen>
               ),
               TextButton(
                 onPressed: () {
+                  adsServer.showInterstitialIfAvailable(true);
                   Navigator.of(context).pop(false);
                 },
                 child: const Text('Continue',

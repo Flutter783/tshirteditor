@@ -3,13 +3,20 @@ import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:tshirteditor/constants/assets.dart';
 import 'package:tshirteditor/screens/design_screen.dart';
 import 'package:tshirteditor/screens/saved_screen.dart';
 import 'package:tshirteditor/screens/shirt_screen.dart';
 import 'package:tshirteditor/service/app_color.dart';
+import 'package:tshirteditor/services/ad_Server.dart';
+
+import '../internet_checker.dart';
+import '../services/admanager.dart';
+import '../services/bannerAd.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -18,7 +25,60 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver{
+  late BannerAd mainBanner;
+  bool isMainBannerLoaded = false;
+
+  late AppOpenAdManager appOpenAdManager;
+  bool isPaused = false;
+
+  final AdsServer adsServer = AdsServer();
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      loadBannerAd();
+    });
+
+    WidgetsBinding.instance.addObserver(this);
+
+    appOpenAdManager = AppOpenAdManager();
+    appOpenAdManager.loadAd();
+    appOpenAdManager.showAdIfAvailable();
+    loadBannerAd();
+  }
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    if (state == AppLifecycleState.paused) {
+      isPaused = true;
+    }
+    if (state == AppLifecycleState.resumed && isPaused) {
+      appOpenAdManager.showAdIfAvailable();
+      isPaused = false;
+    }
+  }
+
+  void loadBannerAd() {
+    mainBanner = BannerAd(
+      size: AdSize.banner,
+      adUnitId: AdsAssets.bannerAd,
+      listener: BannerAdListener(
+        onAdFailedToLoad: (ad, error) {
+          ad.dispose();
+        },
+        onAdLoaded: (ad) {
+          setState(() {
+            isMainBannerLoaded = true;
+          });
+        },
+      ),
+      request: const AdRequest(),
+    );
+    mainBanner.load();
+  }
+
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
@@ -61,23 +121,12 @@ class _HomeScreenState extends State<HomeScreen> {
                                     color: Colors.black,
                                     spreadRadius: 5,
                                     blurRadius: 20,
-                                    offset: Offset(0, 20), // changes position of shadow on x and y axes
+                                    offset: Offset(0, 20),
                                   ),
                                 ],
                               ),
                             )
                           ],
-                        ),
-                      ),
-                      Align(
-                        alignment: Alignment.topRight,
-                        child: GestureDetector(
-                          onTap: () {},
-                          child: SizedBox(
-                              height: 50,
-                              width: 50,
-                              child: SvgPicture.asset(
-                                  'assets/images/ic_menu.svg')),
                         ),
                       ),
                       Align(
@@ -125,6 +174,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             Expanded(
                               child: GestureDetector(
                                 onTap: () {
+                                  adsServer.showInterstitialIfAvailable(true);
                                   Navigator.push(
                                       context,
                                       MaterialPageRoute(
@@ -180,6 +230,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             Expanded(
                               child: GestureDetector(
                                 onTap: () {
+                                  adsServer.showInterstitialIfAvailable(true);
                                   Navigator.push(
                                       context,
                                       MaterialPageRoute(
@@ -291,7 +342,12 @@ class _HomeScreenState extends State<HomeScreen> {
                               child: Container(),
                             ),
                           ],
-                        )
+                        ),
+                        const SizedBox(height: 20,),
+                        isInternetConnected
+                            ? BannerAdWidget(
+                            width: MediaQuery.of(context).size.width, maxHeight: 100)
+                            : Container(),
                       ],
                     ),
                   ),
@@ -353,7 +409,7 @@ class _HomeScreenState extends State<HomeScreen> {
       appLink = 'https://play.google.com/store/apps/details?id=$appID';
     } else if (Platform.isIOS) {
       appLink =
-          'https://apps.apple.com/us/app/id$appID'; // Ensure correct URL format for iOS
+          'https://apps.apple.com/us/app/id$appID';
     }
 
     if (appLink != null) {
@@ -387,3 +443,4 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 }
+
