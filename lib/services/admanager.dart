@@ -3,28 +3,25 @@ import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:tshirteditor/constants/assets.dart';
 
 class AppOpenAdManager {
-  bool isFirstTime=true;
   AppOpenAd? _appOpenAd;
   bool _isAdAvailable = false;
 
   void loadAd() {
-    if(isFirstTime){
-      AppOpenAd.load(
-        adUnitId: AdsAssets.appOpenAd,
-        request: const AdRequest(),
-        adLoadCallback: AppOpenAdLoadCallback(
-          onAdLoaded: (ad) {
-            _appOpenAd = ad;
-            _isAdAvailable = true;
-            debugPrint("App Open Ad Loaded");
-            showAdIfAvailable();
-          },
-          onAdFailedToLoad: (error) {
-            debugPrint("Failed to load App Open Ad: $error");
-          },
-        ),
-      );
-    }
+    AppOpenAd.load(
+      adUnitId: AdsAssets.appOpenAd,
+      request: const AdRequest(),
+      adLoadCallback: AppOpenAdLoadCallback(
+        onAdLoaded: (ad) {
+          _appOpenAd = ad;
+          _isAdAvailable = true;
+          debugPrint("App Open Ad Loaded");
+          showAdIfAvailable();
+        },
+        onAdFailedToLoad: (error) {
+          debugPrint("Failed to load App Open Ad: $error");
+        },
+      ),
+    );
 
   }
 

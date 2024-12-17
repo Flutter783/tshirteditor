@@ -27,11 +27,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver{
 
   final AdsServer adsServer = AdsServer();
 
-  @override
-  void initState() {
-    super.initState();
-    AppOpenAdManager().loadAd();
-  }
+
 
 
   @override
